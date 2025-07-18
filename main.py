@@ -9,7 +9,9 @@ app = FastAPI()
 # Функция генерации таймера-гифки
 def generate_timer_gif(target_time: datetime) -> BytesIO:
     duration = 60  # секунд
-    now = datetime.utcnow()
+    from datetime import timezone
+    now = datetime.now(timezone.utc)
+
     remaining = int((target_time - now).total_seconds())
     start = min(max(remaining, 0), 60)  # от 0 до 60 секунд
 
