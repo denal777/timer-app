@@ -21,8 +21,8 @@ def generate_timer_gif(target_time: datetime) -> BytesIO:
     width, height = 880, 272
 
     try:
-        font_path = "fonts/TTNormsPro-Italic.ttf"
-        font = ImageFont.truetype(font_path, 40)
+        font_path = "fonts/TTNormsPro-Light.ttf"
+        font = ImageFont.truetype(font_path, 50)
     except:
         font = ImageFont.load_default()
 
