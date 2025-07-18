@@ -7,7 +7,6 @@ from PIL import Image, ImageDraw, ImageFont
 app = FastAPI()
 
 def generate_timer_gif(target_time: datetime) -> BytesIO:
-    # Приводим target_time к UTC, если нужно
     if target_time.tzinfo is None:
         target_time = target_time.replace(tzinfo=timezone.utc)
     else:
@@ -15,7 +14,7 @@ def generate_timer_gif(target_time: datetime) -> BytesIO:
 
     now = datetime.now(timezone.utc)
     remaining = int((target_time - now).total_seconds())
-    start = min(max(remaining, 0), 60)  # От 0 до 60 секунд
+    start = min(max(remaining, 0), 60)
 
     frames = []
     font = ImageFont.load_default()
@@ -25,7 +24,12 @@ def generate_timer_gif(target_time: datetime) -> BytesIO:
         img = Image.new('RGB', size, color=(20, 20, 20))
         draw = ImageDraw.Draw(img)
         text = f"{i:02d} sec"
-        w, h = draw.textsize(text, font=font)
+
+        # Используем textbbox вместо устаревшего textsize
+        bbox = draw.textbbox((0, 0), text, font=font)
+        w = bbox[2] - bbox[0]
+        h = bbox[3] - bbox[1]
+
         draw.text(((size[0] - w) / 2, (size[1] - h) / 2), text, font=font, fill=(255, 255, 255))
         frames.append(img)
 
@@ -40,6 +44,7 @@ def generate_timer_gif(target_time: datetime) -> BytesIO:
     )
     output.seek(0)
     return output
+
 
 @app.get("/timer.gif")
 def timer_gif(to: str = Query(...)):
