@@ -14,23 +14,42 @@ def generate_timer_gif(target_time: datetime) -> BytesIO:
 
     now = datetime.now(timezone.utc)
     remaining = int((target_time - now).total_seconds())
-    start = min(max(remaining, 0), 60)
+    start = max(remaining, 0)
+    duration = min(start, 60)  # Количество кадров в GIF (последние 60 секунд)
+
+    width, height = 400, 160
+
+    try:
+        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+        font = ImageFont.truetype(font_path, 60)
+    except:
+        font = ImageFont.load_default()
 
     frames = []
-    font = ImageFont.load_default()
-    size = (200, 80)
 
-    for i in range(start, max(start - 60, -1), -1):
-        img = Image.new('RGB', size, color=(20, 20, 20))
+    for i in range(duration, max(duration - 60, -1), -1):
+        seconds_left = i
+        days = seconds_left // 86400
+        hours = (seconds_left % 86400) // 3600
+        minutes = (seconds_left % 3600) // 60
+        seconds = seconds_left % 60
+
+        text = f"{days:02}:{hours:02}:{minutes:02}:{seconds:02}"
+
+        img = Image.new('RGB', (width, height), color=(20, 20, 20))
         draw = ImageDraw.Draw(img)
-        text = f"{i:02d} sec"
 
-        # Используем textbbox вместо устаревшего textsize
         bbox = draw.textbbox((0, 0), text, font=font)
-        w = bbox[2] - bbox[0]
-        h = bbox[3] - bbox[1]
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
 
-        draw.text(((size[0] - w) / 2, (size[1] - h) / 2), text, font=font, fill=(255, 255, 255))
+        draw.text(
+            ((width - text_width) / 2, (height - text_height) / 2),
+            text,
+            font=font,
+            fill=(255, 255, 255)
+        )
+
         frames.append(img)
 
     output = BytesIO()
@@ -44,6 +63,7 @@ def generate_timer_gif(target_time: datetime) -> BytesIO:
     )
     output.seek(0)
     return output
+
 
 
 @app.get("/timer.gif")
