@@ -18,11 +18,11 @@ def generate_timer_gif(target_time: datetime) -> BytesIO:
 
     duration = min(start, 60)  # 60 кадров или меньше, если осталось меньше
 
-    width, height = 400, 160
+    width, height = 880, 272
 
     try:
-        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-        font = ImageFont.truetype(font_path, 60)
+        font_path = "fonts/TTNormsPro-Italic.ttf"
+        font = ImageFont.truetype(font_path, 40)
     except:
         font = ImageFont.load_default()
 
