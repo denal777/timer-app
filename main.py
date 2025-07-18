@@ -15,7 +15,8 @@ def generate_timer_gif(target_time: datetime) -> BytesIO:
     now = datetime.now(timezone.utc)
     remaining = int((target_time - now).total_seconds())
     start = max(remaining, 0)
-    duration = min(start, 60)  # Количество кадров в GIF (последние 60 секунд)
+
+    duration = min(start, 60)  # 60 кадров или меньше, если осталось меньше
 
     width, height = 400, 160
 
@@ -27,7 +28,8 @@ def generate_timer_gif(target_time: datetime) -> BytesIO:
 
     frames = []
 
-    for i in range(duration, max(duration - 60, -1), -1):
+    # Генерируем кадры с текущего времени down to (start - duration + 1)
+    for i in range(start, start - duration, -1):
         seconds_left = i
         days = seconds_left // 86400
         hours = (seconds_left % 86400) // 3600
@@ -63,6 +65,7 @@ def generate_timer_gif(target_time: datetime) -> BytesIO:
     )
     output.seek(0)
     return output
+
 
 
 
